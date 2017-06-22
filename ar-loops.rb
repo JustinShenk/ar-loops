@@ -14,16 +14,20 @@ def listen_to_unity()
     y = raw[2].to_i
     if instrument == "Piano"
       puts "settings:", i
+      $pianoAmp = 1
       $pianoX = x / 40
       $pianoY = y / 40
       puts $pianoX, $pianoY
     elsif instrument == "Guitar"
+$guitarAmp = 1
       $guitarX = x / 40
       $guitarY = y / 40
     elsif instrument == "Drums"
+$drumsAmp = 1
       $drumsX = x / 40
       $drumsY = y / 40
     elsif instrument == "Sax"
+$saxAmp = 1
       $saxX = x / 40
       $saxY = y / 40
     end
@@ -37,7 +41,7 @@ end
 
 live_loop :drums do
   sample :loop_amen
-  
+  sleep 
 end
 
 
