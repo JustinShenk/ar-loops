@@ -1,26 +1,52 @@
 # Augmented Reality Sound Controller for Sonic Pi using Unity
+##| set_sched_ahead_time! 0.     #for short latency
+
 $settings = sync "/notesend"
-$piano = $settings[0]
+$values = $settings
 
 def listen_to_unity()
   $settings = sync "/notesend"
-  $pianoStrings = $settings[0].split(",").last.to_i / 40
-  puts "setting: ", $settings
+  puts "setings!: ", $settings[0]
+  $settings.each do |i|
+    raw = i.split(",")
+    instrument = raw.first
+    x = raw[1].to_i
+    y = raw[2].to_i
+    if instrument == "Piano"
+      puts "settings:", i
+      $pianoX = x / 40
+      $pianoY = y / 40
+      puts $pianoX, $pianoY
+    elsif instrument == "Guitar"
+      $guitarX = x / 40
+      $guitarY = y / 40
+    elsif instrument == "Drums"
+      $drumsX = x / 40
+      $drumsY = y / 40
+    elsif instrument == "Sax"
+      $saxX = x / 40
+      $saxY = y / 40
+    end
+  end
 end
 
 live_loop :time do
   listen_to_unity()
-  puts "piano:", $settings[0]
-  sleep 2
+  sleep 0.25
 end
-##| with_fx :wobble, phase: 1, phase_slide: $guitarVolume do
+
+live_loop :drums do
+  sample :loop_amen
+  
+end
+
+
 live_loop :loop do
-  puts "piano-strings ", $pianoStrings
+  ##| puts "piano-strings ", $pianoX
   [1, 3, 6, 4].each do |d|
     (range -3, 3).each do |i|
-      play_chord (chord_degree d, :c, :major, $pianoStrings, invert: i)
+      play_chord (chord_degree d, :c, :major, $pianoX, invert: i)
       sleep 0.25
     end
   end
 end
-##| end
