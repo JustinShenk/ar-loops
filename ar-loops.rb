@@ -4,6 +4,8 @@
 $settings = sync "/notesend"
 $values = $settings
 
+dir = "/Users/justinshenk/Projects/ar-loops/"
+
 def listen_to_unity()
   $settings = sync "/notesend"
   puts "setings!: ", $settings[0]
@@ -41,9 +43,27 @@ end
 
 live_loop :drums do
   sample :loop_amen
-  sleep 
+  sleep
 end
 
+live_loop :sax6 do
+  sample dir, :alto1, amp: 0.1, attack: 2, beat_stretch: 3
+  ##| sample :ambi_choir
+  sleep 2
+end
+
+# OPTIONAL
+##| live_loop :guitar1 do
+### high beat stretch needed (around 40)
+##|   sample dir + "guitarcrunch.wav", beat_stretch: 40
+##|   sleep 6
+##| end
+
+live_loop :guitar do
+# beat_stretch between 1 and 2 sounds good
+  sample dir + "guitar1.wav", beat_stretch: 1
+  sleep 2
+end
 
 live_loop :loop do
   ##| puts "piano-strings ", $pianoX
