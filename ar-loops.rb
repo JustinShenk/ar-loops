@@ -2,38 +2,25 @@
 ##| set_sched_ahead_time! 0.     #for short latency
 
 $settings = sync "/notesend"
-$values = $settings
-
-dir = "/Users/justinshenk/Projects/ar-loops/"
+dir = "<insert path to sample directory>"
 
 def listen_to_unity()
   $settings = sync "/notesend"
-  puts "setings!: ", $settings[0]
-  $settings.each do |i|
-    raw = i.split(",")
-    instrument = raw.first
-    x = raw[1].to_i
-    y = raw[2].to_i
-    if instrument == "Piano"
-      puts "settings:", i
-      $pianoAmp = 1
-      $pianoX = x / 40
-      $pianoY = y / 40
-      puts $pianoX, $pianoY
-    elsif instrument == "Guitar"
-$guitarAmp = 1
-      $guitarX = x / 40
-      $guitarY = y / 40
-    elsif instrument == "Drums"
-$drumsAmp = 1
-      $drumsX = x / 40
-      $drumsY = y / 40
-    elsif instrument == "Sax"
-$saxAmp = 1
-      $saxX = x / 40
-      $saxY = y / 40
-    end
-  end
+  puts "setings!: ", $settings
+  parameters = $settings[0].split(",")
+  # Initialize instrument volume as 0
+  $guitarAmp = parameters[0].to_i
+  $drumsAmp = parameters[1].to_i
+  $pianoAmp = parameters[2].to_i
+  $saxAmp = parameters[3].to_i
+  $guitarX = parameters[4].to_i / 40
+  $drumsX = parameters[5].to_i / 40
+  $pianoX = parameters[6].to_i / 40
+  $saxX = parameters[7].to_i / 40
+  $guitarY = parameters[8].to_i / 40
+  $drumsY = parameters[9].to_i / 40
+  $pianoY = parameters[10].to_i / 40
+  $saxY = parameters[11].to_i / 40
 end
 
 live_loop :time do
@@ -42,17 +29,19 @@ live_loop :time do
 end
 
 live_loop :drums do
-  sample :loop_amen
-  sleep
+  if ($drumsAmp > 0)
+    sample :loop_amen, amp: $drumsY*0.5, beat_stretch: $drumsX/8.0
+  end
+  sleep 1.0
 end
-
 live_loop :sax6 do
-  sample dir, :alto1, amp: 0.1, attack: 2, beat_stretch: 3
+  if ($saxAmp > 0)
+    sample dir, :alto1, amp: 0.1, attack: 2, beat_stretch: 3, amp: $saxY, pitch: $saxX/10.0
+  end
   ##| sample :ambi_choir
   sleep 2
 end
 
-# OPTIONAL
 ##| live_loop :guitar1 do
 ### high beat stretch needed (around 40)
 ##|   sample dir + "guitarcrunch.wav", beat_stretch: 40
@@ -60,17 +49,23 @@ end
 ##| end
 
 live_loop :guitar do
-# beat_stretch between 1 and 2 sounds good
-  sample dir + "guitar1.wav", beat_stretch: 1
-  sleep 2
+  # beat_stretch between 1 and 2 sounds good
+  if ($guitarAmp > 0)
+    sample dir + "guitar1.wav", beat_stretch: $guitarX/15.0, amp: $guitarY
+    sleep 0.5
+  end
+  sleep 0.5
 end
 
 live_loop :loop do
   ##| puts "piano-strings ", $pianoX
-  [1, 3, 6, 4].each do |d|
-    (range -3, 3).each do |i|
-      play_chord (chord_degree d, :c, :major, $pianoX, invert: i)
-      sleep 0.25
+  if ($pianoAmp > 0)
+    [1, 3].each do |d|
+      (range -1, 1).each do |i|
+        play_chord (chord_degree d, :c, :major, $pianoX, amp: $pianoY,invert: i)
+        sleep 0.3
+      end
     end
   end
+  sleep 1.0
 end
